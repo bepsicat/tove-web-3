@@ -5,7 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import Button from "@/components/ui/Button";
 
-type BookingType = "" | "weekday" | "weekend" | "private";
+type Status = "idle" | "loading" | "success" | "error";
+
+// 14:00 → 23:45 in 15-min steps
+const timeSlots = Array.from({ length: 40 }, (_, i) => {
+  const mins = 14 * 60 + i * 15;
+  const h = Math.floor(mins / 60).toString().padStart(2, "0");
+  const m = (mins % 60).toString().padStart(2, "0");
+  return `${h}:${m}`;
+});
 
 const fieldVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -21,11 +29,58 @@ const fieldVariants = {
 };
 
 export default function Booking() {
-  const [bookingType, setBookingType] = useState<BookingType>("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
 
-  const handleSubmit = (e: FormEvent) => {
+  const selectedDay = date ? new Date(date + "T12:00:00").getDay() : -1;
+  const isFriOrSat = selectedDay === 5 || selectedDay === 6;
+  const isWeekendBlocked = isFriOrSat && time !== "" && time >= "17:30";
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isWeekendBlocked) return;
+
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, date, time, message }),
+      });
+
+      if (!res.ok) throw new Error();
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
   };
+
+  if (status === "success") {
+    return (
+      <SectionWrapper className="bg-brown text-white" id="booking">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            className="text-center py-20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <h2 className="font-serif text-4xl md:text-5xl mb-6">
+              We&apos;ll be in touch.
+            </h2>
+            <p className="text-white/60 font-light text-lg">
+              Your inquiry has been sent. We&apos;ll reply to{" "}
+              <span className="text-mustard">{email}</span> shortly.
+            </p>
+          </motion.div>
+        </div>
+      </SectionWrapper>
+    );
+  }
 
   return (
     <SectionWrapper className="bg-brown text-white" id="booking">
@@ -43,72 +98,93 @@ export default function Booking() {
           </motion.h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {[
-              {
-                label: "Name",
-                type: "text",
-                placeholder: "Your name",
-                required: true,
-              },
-              {
-                label: "Email",
-                type: "email",
-                placeholder: "your@email.com",
-                required: true,
-              },
-            ].map((field, i) => (
-              <motion.div
-                key={field.label}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-              >
-                <label className="block text-sm uppercase tracking-wider text-white/60 mb-2">
-                  {field.label}
-                </label>
-                <input
-                  type={field.type}
-                  required={field.required}
-                  className="w-full bg-transparent border-b border-white/30 pb-2 text-white placeholder:text-white/30 focus:border-mustard focus:outline-none transition-colors duration-500"
-                  placeholder={field.placeholder}
-                />
-              </motion.div>
-            ))}
-
+            {/* Name */}
             <motion.div
-              custom={2}
+              custom={0}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fieldVariants}
             >
               <label className="block text-sm uppercase tracking-wider text-white/60 mb-2">
-                What are you looking for?
+                Name
               </label>
-              <select
-                value={bookingType}
-                onChange={(e) => setBookingType(e.target.value as BookingType)}
-                className="w-full bg-transparent border-b border-white/30 pb-2 text-white focus:border-mustard focus:outline-none transition-colors duration-500 cursor-pointer"
-              >
-                <option value="" className="text-brown">
-                  Select...
-                </option>
-                <option value="weekday" className="text-brown">
-                  Weekday reservation
-                </option>
-                <option value="weekend" className="text-brown">
-                  Weekend visit
-                </option>
-                <option value="private" className="text-brown">
-                  Private event
-                </option>
-              </select>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-transparent border-b border-white/30 pb-2 text-white placeholder:text-white/30 focus:border-mustard focus:outline-none transition-colors duration-500"
+                placeholder="Your name"
+              />
             </motion.div>
 
+            {/* Email */}
+            <motion.div
+              custom={1}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fieldVariants}
+            >
+              <label className="block text-sm uppercase tracking-wider text-white/60 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-transparent border-b border-white/30 pb-2 text-white placeholder:text-white/30 focus:border-mustard focus:outline-none transition-colors duration-500"
+                placeholder="your@email.com"
+              />
+            </motion.div>
+
+            {/* Date + Time */}
+            <motion.div
+              custom={2}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fieldVariants}
+              className="grid grid-cols-2 gap-6"
+            >
+              <div>
+                <label className="block text-sm uppercase tracking-wider text-white/60 mb-2">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                  className="w-full bg-transparent border-b border-white/30 pb-2 text-white focus:border-mustard focus:outline-none transition-colors duration-500 [color-scheme:dark]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm uppercase tracking-wider text-white/60 mb-2">
+                  Arrival
+                </label>
+                <select
+                  required
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="w-full bg-transparent border-b border-white/30 pb-2 text-white focus:border-mustard focus:outline-none transition-colors duration-500 cursor-pointer"
+                >
+                  <option value="" className="text-brown">Select...</option>
+                  {timeSlots.map((slot) => (
+                    <option key={slot} value={slot} className="text-brown">
+                      {slot}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
+            {/* Fri/Sat cutoff warning */}
             <AnimatePresence>
-              {bookingType === "weekend" && (
+              {isFriOrSat && !isWeekendBlocked && (
                 <motion.p
                   className="text-mustard text-sm font-light leading-relaxed"
                   initial={{ opacity: 0, height: 0 }}
@@ -120,8 +196,21 @@ export default function Booking() {
                   come, first served.
                 </motion.p>
               )}
+              {isWeekendBlocked && (
+                <motion.p
+                  className="text-red-300 text-sm font-light leading-relaxed"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                >
+                  Walk-ins only after 17:30 on Fri/Sat &mdash; no reservations.
+                  See you then!
+                </motion.p>
+              )}
             </AnimatePresence>
 
+            {/* Message */}
             <motion.div
               custom={3}
               initial="hidden"
@@ -134,11 +223,14 @@ export default function Booking() {
               </label>
               <textarea
                 rows={3}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 className="w-full bg-transparent border-b border-white/30 pb-2 text-white placeholder:text-white/30 focus:border-mustard focus:outline-none transition-colors duration-500 resize-none"
                 placeholder="Tell us what you need"
               />
             </motion.div>
 
+            {/* Submit */}
             <motion.div
               custom={4}
               initial="hidden"
@@ -146,9 +238,24 @@ export default function Booking() {
               viewport={{ once: true }}
               variants={fieldVariants}
             >
-              <Button variant="primary" type="submit">
-                Send inquiry
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={isWeekendBlocked || status === "loading"}
+              >
+                {status === "loading" ? "Sending..." : "Send inquiry"}
               </Button>
+              {status === "error" && (
+                <p className="mt-3 text-red-300 text-sm font-light">
+                  Something went wrong. Try emailing us directly at{" "}
+                  <a
+                    href="mailto:kontakt@tove.dk"
+                    className="underline underline-offset-2"
+                  >
+                    kontakt@tove.dk
+                  </a>
+                </p>
+              )}
             </motion.div>
           </form>
         </div>
@@ -167,7 +274,7 @@ export default function Booking() {
 
           <div className="aspect-[4/3] bg-brown-light rounded-sm overflow-hidden mb-8">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2250.1!2d12.5555!3d55.6665!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4652530fc4b5e3c7%3A0x8711de28a2ad5b28!2sGasv%C3%A6rksvej%2029%2C%201656%20K%C3%B8benhavn!5e0!3m2!1sen!2sdk!4v1"
+              src="https://maps.google.com/maps?q=Gasv%C3%A6rksvej+29%2C+1656+K%C3%B8benhavn+V%2C+Denmark&output=embed"
               className="w-full h-full border-0 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
               allowFullScreen
               loading="lazy"

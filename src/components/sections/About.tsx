@@ -13,7 +13,7 @@ export default function About() {
   const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
 
   const headingWords =
-    "Situated just next to Kodbyen. The perfect place to start your night — or never leave.".split(
+    "Situated just next to Kødbyen. The perfect place to start your night - or never leave.".split(
       " "
     );
 
@@ -60,8 +60,13 @@ export default function About() {
             style={{ transformOrigin: "left" }}
           />
           <p className="text-lg md:text-xl leading-relaxed font-light text-brown/80">
-            Natural wines sourced by Allez Allez. Cocktails made right. Music that
-            supports conversation, not dominates it.
+            Beers on tap. Cocktails made right. Natural wines by the glass.
+            Tove brings you the best of the city’s bars, all under one roof. 
+            Whether you’re looking for a quick drink before dinner or a place 
+            to linger into the night, we’ve got you covered. Our menu is 
+            designed to be approachable and delicious, with something 
+            for everyone. Come on in, grab a seat, and 
+            let us take care of the rest.
           </p>
         </motion.div>
       </motion.div>

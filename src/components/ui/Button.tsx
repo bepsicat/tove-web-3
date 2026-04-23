@@ -18,7 +18,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "inline-block px-8 py-3 text-sm uppercase tracking-[0.15em] font-medium transition-all duration-500 ease-out cursor-pointer";
+    "inline-block px-8 py-3 text-sm uppercase tracking-[0.15em] font-medium transition-all duration-500 ease-out cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed";
   const variants = {
     primary: "bg-mustard text-brown hover:bg-mustard/80",
     outline: "border border-brown text-brown hover:bg-brown hover:text-white",

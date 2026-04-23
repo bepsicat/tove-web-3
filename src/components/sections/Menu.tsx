@@ -7,21 +7,46 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 const houseFavorites = [
   { name: "Mikkeller IPA", price: "45/65 DKK", description: "Hops without the attitude." },
   { name: "Angelo Perotti", price: "45/65 DKK", description: "Clean, crisp, Italian." },
-  { name: "Toves White", price: "75/325 DKK", description: "Natural white. Bright, mineral, drinks easy." },
+  { name: "White Wine", price: "75/325 DKK", description: "Natural white. Bright, mineral, drinks easy." },
   { name: "Vermouth Tonic", price: "75 DKK", description: "Aperitivo energy." },
   { name: "Vodka Mat\u00e9", price: "80 DKK", description: "Caffeinated clarity." },
-  { name: "Tove Margarita", price: "90 DKK", description: "Heat. Lime. Salt rim. The way it should be." },
+  { name: "Tove Margarita", price: "90 DKK", description: "Tequila. Lime. Spicy. The way it should be." },
   { name: "Whiskey Sour", price: "90 DKK", description: "Classic. No shortcuts." },
   { name: "Negroni", price: "95 DKK", description: "Bitter. Stirred. Perfect." },
 ];
 
 const fullMenu = {
+  "Long Drinks": [
+    { name: "Vermouth Tonic", price: "75 DKK" },
+    { name: "Gin & Tonic", price: "80 DKK" },
+    { name: "Vodka Mat\u00e9", price: "80 DKK" },
+    { name: "Tequila Soda", price: "80 DKK" },
+    { name: "Cuba Libre", price: "85 DKK" },
+  ],
+  Cocktails: [
+    { name: "Paloma", price: "85 DKK" },
+    { name: "Gin Hass", price: "85 DKK" },
+    { name: "Tove Margarita", price: "90 DKK" },
+    { name: "Whiskey Sour", price: "90 DKK" },
+    { name: "Vermouth Sour", price: "90 DKK" },
+    { name: "Gin Sour", price: "90 DKK" },
+    { name: "Negroni", price: "95 DKK" },
+    { name: "Long Island Cowboy", price: "120 DKK" },
+  ],
+  Shots: [
+    { name: "Tove Special", price: "30 / 250 DKK", note: "single / ten" },
+    { name: "Ferrari", price: "30 / 250 DKK" },
+    { name: "Fernet", price: "30 / 250 DKK" },
+    { name: "Sambuca", price: "30 / 250 DKK" },
+    { name: "House Tequila", price: "30 / 250 DKK" },
+    { name: "1942 Don Julio", price: "100 DKK" },
+  ],
   "Bottled Beer": [
     { name: "Carlsberg", price: "32 DKK" },
     { name: "Gr\u00f8n Tuborg", price: "32 DKK" },
     { name: "Tuborg Classic", price: "32 DKK" },
     { name: "Gulddame", price: "35 DKK" },
-    { name: "5x Bottles", price: "125 DKK" },
+    { name: "5x Bottles", price: "135 DKK" },
   ],
   "Draught Beer": [
     { name: "Gr\u00f8n Tuborg", price: "35/55 DKK", note: "small/large" },
@@ -30,37 +55,21 @@ const fullMenu = {
     { name: "Mikkeller IPA", price: "45/65 DKK" },
     { name: "Angelo Perotti", price: "45/65 DKK" },
   ],
-  "Non-Alc Beer": [
-    { name: "Mikkeller", price: "45 DKK" },
-    { name: "Brooklyn", price: "45 DKK" },
+  "Non-Alc": [
+    { name: "Beer", price: "45 DKK" },
+    { name: "Kombucha", price: "45 DKK" },
   ],
   "Natural Wines": [
-    { name: "Toves Red", price: "75/325 DKK", note: "glass/bottle" },
-    { name: "Toves White", price: "75/325 DKK" },
-    { name: "Toves Orange", price: "75/325 DKK" },
-    { name: "Champagne?", price: "1200 DKK" },
-  ],
-  Mixers: [
-    { name: "Vermouth Tonic", price: "75 DKK" },
-    { name: "Gin Tonic", price: "80 DKK" },
-    { name: "Vodka Mat\u00e9", price: "80 DKK" },
-    { name: "Tequila Soda", price: "80 DKK" },
-    { name: "Rum Coke", price: "85 DKK" },
-  ],
-  Cocktails: [
-    { name: "Tove Margarita", price: "90 DKK" },
-    { name: "Whiskey Sour", price: "90 DKK" },
-    { name: "Gin Sour", price: "90 DKK" },
-    { name: "Negroni", price: "95 DKK" },
-    { name: "Whatever", price: "100 DKK" },
-    { name: "Long Island Cowboy", price: "115 DKK" },
+    { name: "Red", price: "75/325 DKK", note: "glass/bottle" },
+    { name: "White", price: "75/325 DKK" },
+    { name: "Orange", price: "75/325 DKK" },
+    { name: "Bubbles", price: "ask in the bar" },
   ],
   Snacks: [
-    { name: "Chips w. Dip", price: "45 DKK" },
+    { name: "Chips w. Dip", price: "40 DKK" },
     { name: "Nuts", price: "35 DKK" },
-    { name: "Fl\u00e6skesv\u00e6r", price: "35 DKK" },
+    { name: "Pork Crackling", price: "35 DKK" },
     { name: "Olives", price: "35 DKK" },
-    { name: "Popcorn", price: "35 DKK" },
   ],
 };
 

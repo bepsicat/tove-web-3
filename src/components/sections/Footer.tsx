@@ -70,27 +70,29 @@ export default function Footer() {
             href="https://instagram.com/tovecph"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-mustard hover:text-white transition-colors duration-500 text-sm"
+            className="group inline-flex items-center gap-3 text-mustard hover:text-white transition-colors duration-500"
           >
-            @tovecph
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+            </svg>
+            <span className="text-sm">@tovecph</span>
           </a>
-          {/* Instagram grid with cascading reveal */}
-          <div className="mt-6 grid grid-cols-3 gap-2">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <motion.div
-                key={i}
-                className="aspect-square bg-white/10 rounded-sm hover:bg-white/20 transition-colors duration-500"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  delay: 0.4 + i * 0.08,
-                  duration: 0.5,
-                  ease: [0.25, 0.1, 0.25, 1],
-                }}
-              />
-            ))}
-          </div>
+          <p className="mt-4 text-sm text-white/40 font-light leading-relaxed">
+            See what&apos;s going on at the bar.
+          </p>
         </motion.div>
       </div>
 

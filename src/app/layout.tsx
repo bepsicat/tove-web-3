@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   title: "Tove — Vesterbro's Living Room",
   description:
     "Re-opened in 2024, Tove is Vesterbro's living room. Classic beers. Modern drinks. Delicate wine. Fair prices.",
-  metadataBase: new URL("https://tovecph.dk"),
+  metadataBase: new URL("https://tove.dk"),
   openGraph: {
     title: "Tove — Vesterbro's Living Room",
     description:
