@@ -166,18 +166,34 @@ export default function Menu() {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          <button
-            onClick={() => setShowFull(!showFull)}
+          <a
+            href="/menu"
+            aria-controls="full-menu"
+            aria-expanded={showFull}
+            onClick={(event) => {
+              if (
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey
+              ) {
+                return;
+              }
+
+              event.preventDefault();
+              setShowFull(!showFull);
+            }}
             className="inline-block px-8 py-3 text-sm uppercase tracking-[0.15em] font-medium transition-all duration-500 ease-out cursor-pointer bg-mustard text-brown hover:bg-mustard/80"
           >
             {showFull ? "Show less" : "View full menu"}
-          </button>
+          </a>
         </motion.div>
 
         {/* Expandable full menu */}
         <AnimatePresence>
           {showFull && (
             <motion.div
+              id="full-menu"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}

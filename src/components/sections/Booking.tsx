@@ -97,6 +97,12 @@ export default function Booking() {
             Come by
           </motion.h2>
 
+          <p className="mb-8 max-w-xl text-sm font-light leading-relaxed text-white/60">
+            Reservations are welcome throughout opening hours Tuesday to
+            Thursday. On Friday and Saturday, reservations are available for
+            arrivals up to 17:30; after that, it&apos;s walk-ins only.
+          </p>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name */}
             <motion.div

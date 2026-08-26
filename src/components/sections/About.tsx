@@ -60,13 +60,13 @@ export default function About() {
             style={{ transformOrigin: "left" }}
           />
           <p className="text-lg md:text-xl leading-relaxed font-light text-brown/80">
-            Beers on tap. Cocktails made right. Natural wines by the glass.
-            Tove brings you the best of the city’s bars, all under one roof. 
-            Whether you’re looking for a quick drink before dinner or a place 
-            to linger into the night, we’ve got you covered. Our menu is 
-            designed to be approachable and delicious, with something 
-            for everyone. Come on in, grab a seat, and 
-            let us take care of the rest.
+            Tove is a bar on Vesterbro, Copenhagen, serving cold beers,
+            cocktails made right and natural wines by the glass. We bring you
+            the best of the city’s bars, all under one roof. Whether you’re
+            looking for a quick drink before dinner or a place to linger into
+            the night, we’ve got you covered. Our menu is approachable and
+            delicious, with something for everyone. Come on in, grab a seat,
+            and let us take care of the rest.
           </p>
         </motion.div>
       </motion.div>

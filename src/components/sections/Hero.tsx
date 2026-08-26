@@ -90,7 +90,9 @@ export default function Hero() {
               ease: "easeInOut",
             }}
           >
-            <h1 className="sr-only">Tove</h1>
+            <h1 className="sr-only">
+              Tove — Bar on Vesterbro, Copenhagen
+            </h1>
             <Logo
               className="w-[280px] md:w-[420px] lg:w-[500px] mx-auto"
               fill="#ECBB69"
