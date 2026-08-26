@@ -1,16 +1,47 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// TODO: verify tove.dk in Resend dashboard (resend.com/domains) before going live,
-// then change the from address to: Tove <noreply@tove.dk>
-const FROM = "Tove Booking <onboarding@resend.dev>";
+const FROM = "Tove Booking <noreply@tove.dk>";
 const TO = "kontakt@tove.dk";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
-function formatDate(dateStr: string) {
-  const [year, month, day] = dateStr.split("-").map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString("da-DK", {
+function escapeHtml(value: string) {
+  const characters: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+
+  return value.replace(/[&<>"']/g, (character) => characters[character]);
+}
+
+function parseDate(dateString: string) {
+  const match = DATE_PATTERN.exec(dateString);
+  if (!match) return null;
+
+  const [, yearString, monthString, dayString] = match;
+  const year = Number(yearString);
+  const month = Number(monthString);
+  const day = Number(dayString);
+  const date = new Date(year, month - 1, day);
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString("da-DK", {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -19,22 +50,53 @@ function formatDate(dateStr: string) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
   const { name, email, date, time, message } = body as {
-    name: string;
-    email: string;
-    date: string;
-    time: string;
-    message?: string;
+    name?: unknown;
+    email?: unknown;
+    date?: unknown;
+    time?: unknown;
+    message?: unknown;
   };
 
-  if (!name || !email || !date || !time) {
+  if (
+    typeof name !== "string" ||
+    typeof email !== "string" ||
+    typeof date !== "string" ||
+    typeof time !== "string" ||
+    !name.trim() ||
+    !email.trim() ||
+    !date ||
+    !time
+  ) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
+  if (message !== undefined && typeof message !== "string") {
+    return NextResponse.json({ error: "Invalid message" }, { status: 400 });
+  }
+
+  const normalizedName = name.trim().replace(/[\r\n]+/g, " ");
+  const normalizedEmail = email.trim();
+  const bookingDate = parseDate(date);
+
+  if (!EMAIL_PATTERN.test(normalizedEmail) || !bookingDate || !TIME_PATTERN.test(time)) {
+    return NextResponse.json({ error: "Invalid booking details" }, { status: 400 });
+  }
+
   // Server-side policy enforcement: no bookings at or after 17:30 on Fri/Sat
-  const [year, month, day] = date.split("-").map(Number);
-  const dayOfWeek = new Date(year, month - 1, day).getDay();
+  const dayOfWeek = bookingDate.getDay();
   if ((dayOfWeek === 5 || dayOfWeek === 6) && time >= "17:30") {
     return NextResponse.json(
       { error: "No bookings at or after 17:30 on Fri/Sat" },
@@ -42,7 +104,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const formattedDate = formatDate(date);
+  const formattedDate = formatDate(bookingDate);
+  const safeName = escapeHtml(normalizedName);
+  const safeEmail = escapeHtml(normalizedEmail);
+  const safeMessage = message ? escapeHtml(message) : "";
 
   const html = `
     <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #2c2c2c; background: #f9f6f1; padding: 32px; border-radius: 4px;">
@@ -52,11 +117,11 @@ export async function POST(request: Request) {
       <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
         <tr>
           <td style="padding: 10px 0; color: #888; width: 110px; vertical-align: top;">Name</td>
-          <td style="padding: 10px 0; font-weight: 500;">${name}</td>
+          <td style="padding: 10px 0; font-weight: 500;">${safeName}</td>
         </tr>
         <tr>
           <td style="padding: 10px 0; color: #888; vertical-align: top;">Email</td>
-          <td style="padding: 10px 0;"><a href="mailto:${email}" style="color: #2c2c2c;">${email}</a></td>
+          <td style="padding: 10px 0;"><a href="mailto:${encodeURIComponent(normalizedEmail)}" style="color: #2c2c2c;">${safeEmail}</a></td>
         </tr>
         <tr>
           <td style="padding: 10px 0; color: #888; vertical-align: top;">Date</td>
@@ -67,31 +132,47 @@ export async function POST(request: Request) {
           <td style="padding: 10px 0;">${time}</td>
         </tr>
         ${
-          message
+          safeMessage
             ? `<tr>
           <td style="padding: 10px 0; color: #888; vertical-align: top;">Message</td>
-          <td style="padding: 10px 0; line-height: 1.6;">${message.replace(/\n/g, "<br>")}</td>
+          <td style="padding: 10px 0; line-height: 1.6;">${safeMessage.replace(/\n/g, "<br>")}</td>
         </tr>`
             : ""
         }
       </table>
       <p style="margin: 24px 0 0; font-size: 13px; color: #aaa; border-top: 1px solid #ddd; padding-top: 16px;">
-        Reply directly to this email to respond to ${name}.
+        Reply directly to this email to respond to ${safeName}.
       </p>
     </div>
   `;
 
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("Booking email is not configured: RESEND_API_KEY is missing");
+    return NextResponse.json({ error: "Booking email is unavailable" }, { status: 503 });
+  }
+
   try {
-    await resend.emails.send({
+    const resend = new Resend(apiKey);
+    const { error } = await resend.emails.send({
       from: FROM,
       to: TO,
-      replyTo: email,
-      subject: `Booking request — ${name}, ${formattedDate} ${time}`,
+      replyTo: normalizedEmail,
+      subject: `Booking request — ${normalizedName}, ${formattedDate} ${time}`,
       html,
     });
 
+    if (error) {
+      console.error("Resend rejected booking email", {
+        name: error.name,
+        message: error.message,
+      });
+      return NextResponse.json({ error: "Failed to send email" }, { status: 502 });
+    }
+
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("Unexpected booking email failure", error);
     return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
   }
 }
