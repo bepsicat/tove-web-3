@@ -18,17 +18,38 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
+const siteUrl = "https://www.tove.dk/";
+const siteTitle = "Tove — Bar on Vesterbro, Copenhagen";
+const siteDescription =
+  "Tove is a bar on Vesterbro, Copenhagen, serving cocktails, cold beers and natural wine at Gasværksvej 29.";
+
 export const metadata: Metadata = {
-  title: "Tove — Vesterbro's Living Room",
-  description:
-    "Re-opened in 2024, Tove is Vesterbro's living room. Classic beers. Modern drinks. Delicate wine. Fair prices.",
-  metadataBase: new URL("https://tove.dk"),
+  metadataBase: new URL(siteUrl),
+  title: siteTitle,
+  description: siteDescription,
+  alternates: {
+    canonical: siteUrl,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
   openGraph: {
-    title: "Tove — Vesterbro's Living Room",
-    description:
-      "Classic beers. Modern drinks. Delicate wine. Fair prices. Gasvaerksvej 29, Copenhagen.",
+    title: siteTitle,
+    description: siteDescription,
+    url: siteUrl,
+    siteName: "Tove",
     locale: "da_DK",
     type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: siteTitle,
+    description: siteDescription,
   },
 };
 
