@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import MotionProvider from "@/components/layout/MotionProvider";
 import {
   siteDescription,
@@ -66,6 +67,7 @@ export default function RootLayout({
         <MotionProvider>
           <div className="grain-overlay">{children}</div>
         </MotionProvider>
+        <Analytics />
       </body>
     </html>
   );
